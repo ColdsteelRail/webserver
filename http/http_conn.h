@@ -73,14 +73,14 @@ public:
 	~http_conn();
 
 public:
-	void init(int sockfd, ocnst sockaddr_in &addr, char *, int, int, string user, string passwd, string sqlname);
+	void init(int sockfd, const sockaddr_in &addr, char *, int, int, string user, string passwd, string sqlname);
         void close_conn(bool real_close = true);
         void process();
         // 读取浏览器发来的全部数据
         bool read_once();
         // 相应报文写入函数
         bool write();
-        sockadddr_in *get_address()
+        sockaddr_in *get_address()
         {
                 return &m_address;
         }
@@ -160,16 +160,24 @@ private:
 	char *host;
 	int m_content_length;
 	bool m_linger;
-	char *m_file_address;
 
-    char *m_file_address;       // 读取服务器上的文件地址
-    struct stat m_file_stat;
-    struct iovec m_iv[2];       // io向量机制iovec
-    int m_iv_count;
-    int cgi;                    // 是否启用的POST
-    char *m_string;             // 存储请求头数据
-    int byte_to_send;           // 剩余发送字节数
-    int bytes_have_send;        // 以发送的字节数
+    	char *m_file_address;       // 读取服务器上的文件地址
+    	struct stat m_file_stat;
+    	struct iovec m_iv[2];       // io向量机制iovec
+    	int m_iv_count;
+   	int cgi;                    // 是否启用的POST
+    	char *m_string;             // 存储请求头数据
+    	int byte_to_send;           // 剩余发送字节数
+    	int bytes_have_send;        // 以发送的字节数
+	char *doc_root;
+
+	map<string, string> m_user;
+	int m_TRIGMode;
+	int m_close_log;
+
+	char sql_user[100];
+	char sql_passwd[100];
+	char sql_name[100];
 };
 
 #endif

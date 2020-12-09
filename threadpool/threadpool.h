@@ -1,11 +1,12 @@
 #ifndef THREAD_POOL_H
 #define THREAD_POOL_H
 
+#include <cstdio>
 #include <pthread.h>
 #include <list>
 #include <exception>
 #include "../lock/locker.h"
-#include "../CGlmysql/sql_connection_pool.h"
+#include "../CGImysql/sql_connection_pool.h"
 
 template <typename T>
 class threadpool
@@ -27,7 +28,7 @@ private:
 	std::list<T *> m_workqueue;	// 请求队列
 	locker 	m_qlocker;		// 保护队列互斥锁
 	sem m_qstat;			// 是否有任务需要处理
-	connection_pool *connPool	// 数据库
+	connection_pool *m_connPool;	// 数据库
 	int m_actor_model;		// 模型切换
 };
 
@@ -36,14 +37,14 @@ threadpool<T>::threadpool(int actor_model, connection_pool *connPool,
 			  int thread_number, int max_requests) 
 				:m_actor_model(actor_model),
 				m_thread_number(thread_number), 
-				m_max_qlen(max_requests), 
+				m_qlen(max_requests), 
 				m_threads(NULL),
 				m_connPool(connPool)
 {
 	int i;
 	if (thread_number <= 0 || max_requests <= 0)
 		throw std::exception();
-	m_threads = new thread_t[m_thread_number];
+	m_threads = new pthread_t[m_thread_number];
 	if (!m_threads)
 		throw std::exception();
 	for (i = 0; i < m_thread_number; i++) {
@@ -132,7 +133,7 @@ void threadpool<T>::run()
 				else
 				{
 					request->improv = 1;
-					retuest->timer_flag = 1;
+					request->timer_flag = 1;
 				}
 			}
 			else

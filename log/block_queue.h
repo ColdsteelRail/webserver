@@ -15,8 +15,8 @@ public:
 	{
 		if (capacity <= 0)
 			exit(-1);
-		m__capacity = capacity;
-		m_array = new T[m__capacity];
+		m_capacity = capacity;
+		m_array = new T[m_capacity];
 		m_size = 0;
 		m_front = -1;
 		m_back = -1;
