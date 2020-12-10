@@ -86,7 +86,9 @@ public:
         }
         // 同步线程初始化数据库读取表
         void initmysql_result(connection_pool *connPool);
+		// 工作线程处理时出错，重新初始化http_conn和定时器
         int timer_flag;
+		// Reactor模型下，同一个http_conn的任务必须处理完毕
         int improv;
 
 private:

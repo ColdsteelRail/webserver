@@ -67,7 +67,7 @@ threadpool<T>::~threadpool()
 }
 
 template <typename T>
-bool threadpool<T>::append(T *request)
+bool threadpool<T>::append_p(T *request)
 {
 	m_qlocker.lock();
 	if (m_workqueue.size >= m_qlen) {
@@ -88,7 +88,7 @@ bool threadpool<T>::append(T *request, int state)
 		m_qlocker.unlock();
 		return false;
 	}
-	request->state = state;
+	request->m_state = state;
 	m_workqueue.push_back(request);
 	m_qlocker.unlock();
 	m_qstat.post();
@@ -119,7 +119,7 @@ void threadpool<T>::run()
 		if (!request)
 			continue; /* why */
 
-		if (m_actor_model == 1) /* ET */
+		if (m_actor_model == 1) /* reactor */
 		{
 			if (0 == request->state) 
 			{
@@ -141,17 +141,17 @@ void threadpool<T>::run()
 				/* write */
 				if (request->write())
 				{
-				request->improv = 1;
+					request->improv = 1;
 				}
 				else
 				{
-				request->improv = 1;
-				request->timer_flag = 1;
+					request->improv = 1;
+					request->timer_flag = 1;
 				}	
 			}
 		}
 
-		if (1 == m_actor_model) /* LT */
+		if (0 == m_actor_model) /* preactor */
 		{
 			connectionRAII mysqlcon(&request->mysql, m_connPool);
 	        	request->process();
