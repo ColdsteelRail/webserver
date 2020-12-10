@@ -87,11 +87,16 @@ void WebServer::log_write()
 void WebServer::sql_pool()
 {
 	// 初始化数据库连接池
-	m_connPool = connection_pool::GetConnection();
-	m_connPool->init("localhost", m_user, m_passWord);
+	m_connPool = connection_pool::GetInstance();
+	m_connPool->init("localhost", m_user, m_passWord, m_databaseName, 3306, m_sql_num, m_close_log);
 
 	// 初始化数据库读取表
 	users->initmysql_result(m_connPool);
+}
+
+void WebServer::thread_pool()
+{
+	m_pool = new threadpool<http_conn>(m_actormodel, m_connPool, m_thread_num);
 }
 
 void WebServer::eventListen()
@@ -113,7 +118,7 @@ void WebServer::eventListen()
 	}
 
 	struct sockaddr_in address;
-	bezero(&address, sizeof(address));
+	bzero(&address, sizeof(address));
 	address.sin_family = AF_INET;
 	address.sin_addr.s_addr = htonl(INADDR_ANY);
 	address.sin_port = htons(m_port);
@@ -130,7 +135,7 @@ void WebServer::eventListen()
 
 	// epoll创建内核事件表
 	epoll_event events[MAX_EVENT_NUMBER]; // ?
-	m_epolldf = epoll_create(5);
+	m_epollfd = epoll_create(5);
 	assert(m_epollfd != -1);
 
 	utils.addfd(m_epollfd, m_listenfd, false, m_LISTENTrigmode);
@@ -194,7 +199,7 @@ void WebServer::deal_timer(util_timer *timer, int sockfd)
 bool WebServer::dealclinetdata()
 {
 	struct sockaddr_in client_address;
-	socketlen_t client_addrlength = sizeof(client_address);
+	socklen_t client_addrlength = sizeof(client_address);
 
 	//LT
 	if (0 == m_LISTENTrigmode)
@@ -254,7 +259,7 @@ bool WebServer::dealwithsignal(bool &timeout, bool &stop_server)
 		{
 			switch (signals[i])
 			{
-			case SIGALARM:
+			case SIGALRM:
 			{	
 				timeout = true;
 				break;
@@ -324,7 +329,7 @@ void WebServer::dealwithread(int sockfd)
 }
 
 // 与dealwithread唯一区别在于，preactor模式下，主线程处理write
-void WebServer::dealwithwrite()
+void WebServer::dealwithwrite(int sockfd)
 {
 	util_timer *timer = users_timer[sockfd].timer;
 
@@ -383,7 +388,7 @@ void WebServer::eventLoop()
 	while (!stop_server)
 	{
 		int number = epoll_wait(m_epollfd, events, MAX_EVENT_NUMBER, -1);
-		if (number < 0 && errno != EINTER)
+		if (number < 0 && errno != EINTR)
 		{
 			LOG_ERROR("%s", "epoll failure");
             break;

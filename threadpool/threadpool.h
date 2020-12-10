@@ -16,7 +16,7 @@ public:
 	threadpool(int actor_model, connection_pool *connPool, int thread_number = 8, int max_qlen = 10000);
 	~threadpool();
 	bool append(T *request, int state);
-	bool append(T *request);
+	bool append_p(T *request);
 private:
 	/*工作线程初始化函数，它不断从请求队列取任务并执行*/
 	static void *worker(void *arg);
@@ -70,7 +70,7 @@ template <typename T>
 bool threadpool<T>::append_p(T *request)
 {
 	m_qlocker.lock();
-	if (m_workqueue.size >= m_qlen) {
+	if (m_workqueue.size() >= m_qlen) {
 		m_qlocker.unlock();
 		return false;
 	}
@@ -84,7 +84,7 @@ template <typename T>
 bool threadpool<T>::append(T *request, int state)
 {
 	m_qlocker.lock();
-	if (m_workqueue.size >= m_qlen) {
+	if (m_workqueue.size() >= m_qlen) {
 		m_qlocker.unlock();
 		return false;
 	}
@@ -121,7 +121,7 @@ void threadpool<T>::run()
 
 		if (m_actor_model == 1) /* reactor */
 		{
-			if (0 == request->state) 
+			if (0 == request->m_state) 
 			{
 				/* read */
 				if (request->read_once()) 

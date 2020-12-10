@@ -112,8 +112,8 @@ public:
 			return false;
 		}
 
-		back = (back + 1) % m_capacity;
-		m_array[back] = item;
+		m_back = (m_back + 1) % m_capacity;
+		m_array[m_back] = item;
 		m_size++;
 
 		m_cond.broadcast();
@@ -121,7 +121,7 @@ public:
 		return false;
 	}
 
-	bool pop(const T &item)
+	bool pop(T &item)
 	{
 		m_mutex.lock();
 		while (m_size <= 0) {
@@ -138,7 +138,7 @@ public:
 		return true;
 	}
 
-	bool pop(const T &item, int ms_timeout)
+	bool pop(T &item, int ms_timeout)
 	{
 		struct timespec t = {0, 0};
 		struct timeval now = {0, 0};

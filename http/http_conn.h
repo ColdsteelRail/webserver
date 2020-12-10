@@ -47,7 +47,7 @@ public:
 	};
 	// 主状态机的状态
 	enum CHECK_STATE {
-		CHECK_STATE_REQUESTIONLINE = 0,
+		CHECK_STATE_REQUESTLINE = 0,
 		CHECK_STATE_HEADER,
 		CHECK_STATE_CONTENT
 	};
@@ -65,12 +65,12 @@ public:
 		NO_RESOURCE,
 		FORBIDDEN_REQUEST,
 		FILE_REQUEST,
-		INTERNAL_REQUEST,
+		INTERNAL_ERROR,
 		CLOSED_CONNECTION
 	};
 public:
-	http_conn();
-	~http_conn();
+	http_conn() {};
+	~http_conn() {};
 
 public:
 	void init(int sockfd, const sockaddr_in &addr, char *, int, int, string user, string passwd, string sqlname);
@@ -129,7 +129,7 @@ private:
 public:
 	static int m_epollfd; 	// 内核文件描述符集合
 	static int m_user_count;
-	MYSQL *mmysql;	// 数据库连接
+	MYSQL *mysql;	// 数据库连接
 	int m_state; 	// 读为0， 写为1
 
 // 私有数据
@@ -141,7 +141,7 @@ private:
 	// m_read_buf中数据的最后一个字节的下一位置
 	int m_read_idx;
 	// m_read_buf中读取的位置
-	int checked_idx;
+	int m_checked_idx;
 	// m_read_buf中已经解析的字符个数
 	int m_start_line;
 
@@ -159,7 +159,7 @@ private:
 	char m_real_file[FILENAME_LEN];
 	char *m_url;
 	char *m_version;
-	char *host;
+	char *m_host;
 	int m_content_length;
 	bool m_linger;
 
@@ -169,7 +169,7 @@ private:
     	int m_iv_count;
    	int cgi;                    // 是否启用的POST
     	char *m_string;             // 存储请求头数据
-    	int byte_to_send;           // 剩余发送字节数
+    	int bytes_to_send;           // 剩余发送字节数
     	int bytes_have_send;        // 以发送的字节数
 	char *doc_root;
 

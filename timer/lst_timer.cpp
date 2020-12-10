@@ -149,7 +149,7 @@ void Utils::init(int timeslot)
 	m_TIMESLOT = timeslot;
 }
 
-void Utils::setnonblocking(int fd)
+int Utils::setnonblocking(int fd)
 {
     int old_option = fcntl(fd, F_GETFL);
     int new_option = old_option | O_NONBLOCK;
@@ -190,7 +190,7 @@ void Utils::addsig(int sig, void(handler)(int), bool restart)
     memset(&sa, '\0', sizeof(sa));
     sa.sa_handler = handler;
     if (restart)
-        sa.sa_flag |= SA_RESTART;
+        sa.sa_flags |= SA_RESTART;
     sigfillset(&sa.sa_mask);
     assert(sigaction(sig, &sa, NULL) != -1);
 }

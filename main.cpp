@@ -31,7 +31,7 @@ int main(int argc, char *argv[])
 	server.trig_mode();
 
 	// 监听
-	server.enventListen();
+	server.eventListen();
 
 	// 运行
 	server.eventLoop();

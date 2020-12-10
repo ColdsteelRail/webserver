@@ -19,7 +19,7 @@ public:
 	MYSQL *GetConnection();			// 获取数据库连接
 	bool ReleaseConnection(MYSQL *conn);	// 释放连接
 	int GetFreeConn();			// 获取连接数
-	void DestroyPoll();			// 销毁所有连接
+	void DestroyPool();			// 销毁所有连接
 
 	// 单例模式
 	static connection_pool *GetInstance();
@@ -37,7 +37,7 @@ private:
 	int m_FreeConn;	// 当前空闲的连接数
 	locker lock;
 	list<MYSQL *> connList;	// 连接池
-	sem reverse;
+	sem reserve;
 
 public:
 	string m_url;

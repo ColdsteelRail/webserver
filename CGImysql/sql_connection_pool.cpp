@@ -26,7 +26,7 @@ void connection_pool::init(string url, string User, string PassWord, string DBNa
 	m_url = url;
 	m_Port = Port;
 	m_User = User;
-	m_PassWord = PassWord;
+	m_Password = PassWord;
 	m_DatabaseName = DBName;
 	m_close_log = close_log;
 
@@ -48,7 +48,7 @@ void connection_pool::init(string url, string User, string PassWord, string DBNa
 		++m_FreeConn;
 	}
 
-	reverse = sem(m_FreeConn);
+	reserve = sem(m_FreeConn);
 	m_Maxconn = m_FreeConn;
 }
 
