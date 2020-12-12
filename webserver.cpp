@@ -342,7 +342,7 @@ void WebServer::dealwithwrite(int sockfd)
 		}
 
 		// 将读事件放入请求队列
-		m_pool->append(users + sockfd, 0);
+		m_pool->append(users + sockfd, 1);
 
 		while (true)
 		{
@@ -361,9 +361,9 @@ void WebServer::dealwithwrite(int sockfd)
 	// preactor
 	else
 	{
-		if (users[sockfd].read_once()) // 主线程处理数据，业务逻辑由工作线程完成
+		if (users[sockfd].write()) // 主线程处理数据，业务逻辑由工作线程完成
         {
-            LOG_INFO("deal with the client(%s)", inet_ntoa(users[sockfd].get_address()->sin_addr));
+            LOG_INFO("send data to client(%s)", inet_ntoa(users[sockfd].get_address()->sin_addr));
 
             //若监测到读事件，将该事件放入请求队列
             m_pool->append_p(users + sockfd);
