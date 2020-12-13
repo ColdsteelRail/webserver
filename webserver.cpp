@@ -314,7 +314,7 @@ void WebServer::dealwithread(int sockfd)
             LOG_INFO("deal with the client(%s)", inet_ntoa(users[sockfd].get_address()->sin_addr));
 
             //若监测到读事件，将该事件放入请求队列
-            // m_pool->append_p(users + sockfd);
+            m_pool->append_p(users + sockfd);
 
             if (timer)
             {
@@ -366,7 +366,7 @@ void WebServer::dealwithwrite(int sockfd)
             LOG_INFO("send data to client(%s)", inet_ntoa(users[sockfd].get_address()->sin_addr));
 
             //若监测到读事件，将该事件放入请求队列
-            m_pool->append_p(users + sockfd);
+            //m_pool->append_p(users + sockfd);
 
             if (timer)
             {
