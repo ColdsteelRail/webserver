@@ -1,0 +1,12 @@
+1. webserver的基础框架
+    使用Epoll的边缘触发和边缘触发的IO多路服用；
+    同步的非阻塞IO
+    Reactor模型和模拟Practor模型
+    
+1. 项目中使用了哪些fd？
+    ①在webserver中使用了监听套接字m_listenfd；
+    ②socktpair生成的用于处理信号的套接字；
+    ③以及每个http连接的套接字；
+    ④所有文件描述符都设置为非阻塞（Utils.addfd函数中调用Utils.setnonblocking）
+
+1. 
