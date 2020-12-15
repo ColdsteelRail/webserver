@@ -29,7 +29,7 @@ WebServer::~WebServer()
 }
 
 void WebServer::init(int port, string user, string passWord, string databaseName, int log_write, 
-                     int opt_linger, int trigmode, int sql_num, int thread_num, int close_log, int actor_model)
+                     int trigmode, int sql_num, int thread_num, int close_log, int actor_model)
 {
 	m_port = port;
 	m_user = user;
@@ -38,7 +38,6 @@ void WebServer::init(int port, string user, string passWord, string databaseName
 	m_sql_num = sql_num;
 	m_thread_num = thread_num;
 	m_log_write = log_write;
-	m_OPT_LINGER = opt_linger;
 	m_TRIGMode = trigmode;
 	m_close_log = close_log;
 	m_actormodel = actor_model;
@@ -106,16 +105,8 @@ void WebServer::eventListen()
 	assert(m_listenfd >= 0);
 
 	// 优雅关闭连接
-	if (0 == m_OPT_LINGER)
-	{
-		struct linger tmp = {0, 1};
-		setsockopt(m_listenfd, SOL_SOCKET, SO_LINGER, &tmp, sizeof(tmp));
-	}
-	else if (1 == m_OPT_LINGER)
-	{
-		struct linger tmp = {1, 1};
-        	setsockopt(m_listenfd, SOL_SOCKET, SO_LINGER, &tmp, sizeof(tmp));
-	}
+	struct linger tmp = {1, 1};
+        setsockopt(m_listenfd, SOL_SOCKET, SO_LINGER, &tmp, sizeof(tmp));
 
 	struct sockaddr_in address;
 	bzero(&address, sizeof(address));
