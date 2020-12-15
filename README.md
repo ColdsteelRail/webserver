@@ -21,7 +21,7 @@
 
 ## Usage
 
-	./WebServer [-option value]
+	./server [-option value]
 | option | value | default|
 | :- | - | -: |
 | p | 端口 | 9006 | 

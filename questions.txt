@@ -1,12 +1,28 @@
-1. webserver的基础框架
+webserver的基础框架
     使用Epoll的边缘触发和边缘触发的IO多路服用；
     同步的非阻塞IO
     Reactor模型和模拟Practor模型
     
-1. 项目中使用了哪些fd？
+项目中套接字的使用有哪些？
     ①在webserver中使用了监听套接字m_listenfd；
     ②socktpair生成的用于处理信号的套接字；
-    ③以及每个http连接的套接字；
-    ④所有文件描述符都设置为非阻塞（Utils.addfd函数中调用Utils.setnonblocking）
+    ③以及每个http连接的套接字。
 
-1. 
+关闭超时http连接如何做的？
+    每经过一个timeslot的时间，信号ALARM被触发；
+    信号ALARM被sigaction结构绑定触发函数，即信号被触发后函数被调用；
+    函数向主线程发送消息通知其处理定时器链表（epoll）；
+    定时器都记录有http上次活动的时间，如果超时则关闭http连接。
+
+视频这样的大文件是如何上传的？
+    对于要写入网络的文件，利用mmap从磁盘映射到内存段；
+    记录其长度和起始位置，调用writev与报文头部一同写入socket；
+    但文件过大，如果writev缓存不够一次性上传；
+    那么利用每次writev返回的大小，更新iov，下次继续写；
+    如果已经写完，则将socket在epollfd设置为EPOLL_OUT
+
+如何理解在http/http_conn.cpp中函数write()中对EAGAIN的处理？
+    当调用writev发送时大的数据包时，就可能返回一个EGGAIN的错误；
+    该错误产生的原因是由于tcp socket buffer被占满；随后返回EAGAIN；
+    如此说明iov中的数据没有成功写入，因此不必更新iov；
+    直接触发epoll_wait的EPOLL_OUT将缓存中数据发送，并且不unmap文件数据。
