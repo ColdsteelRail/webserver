@@ -5,7 +5,7 @@
 
 #include <pthread.h>
 #include <sys/time.h>
-#include "../lock/locker.h"
+#include "locker.h"
 
 template <typename T>
 class block_queue

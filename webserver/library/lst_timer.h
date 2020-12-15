@@ -21,7 +21,7 @@
 #include <sys/wait.h>
 #include <sys/uio.h>
 
-#include "../log/log.h"
+#include "log.h"
 #include <time.h>
 
 class util_timer;

@@ -6,8 +6,8 @@
 #include <iostream>
 #include <error.h>
 #include <stdio.h>
-#include "../lock/locker.h"
-#include "../log/log.h"
+#include "locker.h"
+#include "log.h"
 #include <string>
 #include <string.h>
 
